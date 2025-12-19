@@ -32,5 +32,8 @@
   },
   "forwardPorts": [5173],
   "remoteUser": "vscode",
-  "postCreateCommand": "cd frontend && npm install"
+  // 1. Install system libs (as root)
+  // 2. Install pnpm
+  // 3. Install project deps
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev libssl-dev && npm install -g pnpm && pnpm install"
 }
