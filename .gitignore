@@ -1,0 +1,28 @@
+# Node / pnpm
+node_modules
+.pnpm-debug.log
+
+# SvelteKit / frontend output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite artifacts
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Rust / Tauri
+/target
