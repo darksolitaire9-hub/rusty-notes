@@ -1,0 +1,36 @@
+{
+  "name": "Rusty Notes",
+  "image": "mcr.microsoft.com/devcontainers/rust:1-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "files.watcherExclude": {
+          "**/target/**": true,
+          "**/node_modules/**": true
+        }
+      },
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "vadimcn.vscode-lldb",
+        "serayuzgur.crates",
+        "svelte.svelte-vscode",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "containerEnv": {
+    "RUST_BACKTRACE": "1",
+    "RUST_LOG": "info",
+    "NODE_ENV": "development"
+  },
+  "forwardPorts": [5173],
+  "remoteUser": "vscode",
+  "postCreateCommand": "cd frontend && npm install"
+}
