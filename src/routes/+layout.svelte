@@ -1,11 +1,20 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
+  import NavBar from '$lib/components/layout/NavBar.svelte';
+  import '../app.css';
 
-	let { children } = $props();
+  // In Svelte 5, we receive children as a prop instead of using <slot>
+  let { children } = $props();
 </script>
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
+<!-- The App Container -->
+<div class="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+  
+  <!-- Top Navigation -->
+  <NavBar />
 
-{@render children()}
+  <!-- Main Content Area -->
+  <div class="flex flex-1 overflow-hidden">
+    {@render children()}
+  </div>
+
+</div>

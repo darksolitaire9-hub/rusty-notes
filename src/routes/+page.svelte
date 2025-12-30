@@ -1,22 +1,26 @@
 <script lang="ts">
-  let note = "# Rusty Notes\n\nWrite something here...";
+  import Sidebar from "$lib/components/notes/Sidebar.svelte"; 
+  import NoteEditor from "$lib/components/editor/NoteEditor.svelte";
   
-  function save() {
-    console.log("Saving note:", note);
-    alert("Saved! (Check console)");
-  }
+  // Note: We don't need to import noteStore here if your components 
+  // are "smart" (reading the store internally).
 </script>
 
-<div class="app">
-  <h1>🦀 Rusty Notes</h1>
-  <textarea bind:value={note}></textarea>
-  <button on:click={save}>Save Note</button>
-</div>
+<!-- 
+  This div fills the empty space left by the NavBar in your layout.
+  We use 'flex' to put Sidebar and Editor side-by-side.
+-->
+<div class="flex h-full w-full">
+  
+  <!-- Left Column: Sidebar -->
+  <!-- If you updated Sidebar to use the store directly, you don't need props here.
+       If you kept the "props" version, keep passing them like before. -->
+  <Sidebar />
 
-<style>
-  :global(body) { margin: 0; font-family: sans-serif; background: #222; color: #fff; }
-  .app { display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box; }
-  textarea { flex: 1; background: #333; color: #fff; border: 1px solid #444; padding: 10px; font-size: 16px; margin-bottom: 10px; resize: none; }
-  button { padding: 10px 20px; background: #e94e18; color: white; border: none; cursor: pointer; font-weight: bold; }
-  button:hover { background: #ff5e00; }
-</style>
+  <!-- Right Column: Editor -->
+  <!-- 'flex-1' makes it fill the remaining width -->
+  <main class="flex-1 h-full overflow-hidden">
+    <NoteEditor />
+  </main>
+
+</div>
