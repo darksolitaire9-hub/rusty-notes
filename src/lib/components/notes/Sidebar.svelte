@@ -1,22 +1,12 @@
 <script lang="ts">
+  // 1. Import the store
+  import { noteStore } from '$lib/state/notes.svelte';
+  
   import { Button } from '$lib/components/ui/button';
   import { Plus, Trash2, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-svelte';
-  
-  type Note = { id: string; title: string; body: string };
 
-  let { 
-    notes = [], 
-    selectedId = null,
-    onCreate,
-    onSelect,
-    onDelete 
-  } = $props<{
-    notes: Note[];
-    selectedId: string | null;
-    onCreate: () => void;
-    onSelect: (id: string) => void;
-    onDelete: (id: string) => void;
-  }>();
+  // 2. Remove the props definition ($props)
+  // We don't need them because we read directly from noteStore!
 
   // Internal state for "Accordion/Collapse" behavior
   let isCollapsed = $state(false);
@@ -45,7 +35,7 @@
 
     <!-- Create Button (Text hides when collapsed) -->
     <Button 
-      onclick={onCreate} 
+      onclick={() => noteStore.create()} 
       variant={isCollapsed ? "ghost" : "default"}
       size={isCollapsed ? "icon" : "default"}
       class="{isCollapsed ? 'h-8 w-8' : 'flex-1'} transition-all"
@@ -59,11 +49,11 @@
   
   <!-- Note List -->
   <div class="flex-1 overflow-y-auto p-2 space-y-1">
-    {#each notes as note (note.id)}
+    {#each noteStore.notes as note (note.id)}
       <button
-        onclick={() => onSelect(note.id)}
+        onclick={() => noteStore.select(note.id)}
         class="group flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all hover:bg-accent 
-        {selectedId === note.id ? 'bg-accent text-accent-foreground' : ''} 
+        {noteStore.selectedId === note.id ? 'bg-accent text-accent-foreground' : ''} 
         {isCollapsed ? 'justify-center' : 'justify-start'}"
         title={note.title} 
       >
@@ -76,13 +66,14 @@
             <div class="flex items-center justify-between font-semibold">
               <span class="truncate text-sm">{note.title || 'Untitled'}</span>
               
-              {#if selectedId === note.id}
+              <!-- Delete Button: Only show if selected (or you can use group-hover) -->
+              {#if noteStore.selectedId === note.id}
                 <div 
                   role="button" 
                   tabindex="0"
                   class="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-sm hover:bg-background/20"
-                  onclick={(e) => { e.stopPropagation(); onDelete(note.id); }}
-                  onkeydown={(e) => { if(e.key === 'Enter') onDelete(note.id); }}
+                  onclick={(e) => { e.stopPropagation(); noteStore.delete(note.id); }}
+                  onkeydown={(e) => { if(e.key === 'Enter') noteStore.delete(note.id); }}
                 >
                    <Trash2 class="h-3 w-3 text-destructive hover:text-destructive/80" />
                 </div>

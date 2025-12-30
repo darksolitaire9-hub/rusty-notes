@@ -1,5 +1,3 @@
-// src/lib/state/notes.svelte.ts
-
 export type Note = {
     id: string;
     title: string;
@@ -8,26 +6,27 @@ export type Note = {
 };
 
 class NoteState {
-    // 1. The Data (Private access recommended, but public is fine for simplicity)
+    // 1. The Data
     notes = $state<Note[]>([]);
     selectedId = $state<string | null>(null);
+    shouldFocusTitle = $state(false); // Flag to control focus
 
     // 2. Computed Values
-    // This automatically updates whenever notes or selectedId changes
     activeNote = $derived(
         this.notes.find((n) => n.id === this.selectedId) || null
     );
 
     constructor() {
-        // We can load initial data here later
+        // Initial Dummy Data
         this.notes = [
             { id: '1', title: 'Architecture Plan', body: 'Use Svelte 5 Runes for state.', updatedAt: new Date() }
         ];
     }
 
-    // 3. Actions (The API)
+    // 3. Actions
     select(id: string) {
         this.selectedId = id;
+        this.shouldFocusTitle = false; // Don't focus title when just switching notes
     }
 
     create() {
@@ -40,12 +39,20 @@ class NoteState {
         // Add to top of list
         this.notes = [newNote, ...this.notes];
         this.selectedId = newNote.id;
+        this.shouldFocusTitle = true; // Signal the editor to focus
     }
 
     delete(id: string) {
         this.notes = this.notes.filter(n => n.id !== id);
         if (this.selectedId === id) {
             this.selectedId = null;
+        }
+    }
+
+    updateTitle(newTitle: string) {
+        if (this.activeNote) {
+            this.activeNote.title = newTitle;
+            this.activeNote.updatedAt = new Date();
         }
     }
 
