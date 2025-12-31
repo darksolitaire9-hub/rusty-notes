@@ -1,3 +1,6 @@
+// Import Tauri's invoke function to call Rust commands
+import { invoke } from '@tauri-apps/api/core';
+
 export type Note = {
     id: string;
     title: string;
@@ -12,51 +15,73 @@ class NoteState {
     selectedId = $state<string | null>(null);
     shouldFocusTitle = $state(false);
     
-    // ✅ Auto-save timer
+    // Auto-save timer
     private autoSaveTimer: number | null = null;
-    private readonly AUTO_SAVE_DELAY = 120000; // 2 minutes in milliseconds
+    private readonly AUTO_SAVE_DELAY = 120000; // 2 minutes
 
     // 2. Computed Values
     activeNote = $derived(
         this.notes.find((n) => n.id === this.selectedId) || null
     );
 
-    constructor() {
-        // Initial Dummy Data
-        this.notes = [
-            { 
-                id: '1', 
-                title: 'Architecture Plan', 
-                body: 'Use Svelte 5 Runes for state.', 
-                updatedAt: new Date(),
-                isDirty: false
+    // 3. Load all notes from disk on startup
+    async loadAllNotes() {
+        try {
+            // Ask Rust for list of note IDs
+            const ids = await invoke<string[]>('list_notes');
+            
+            // Load each note
+            for (const id of ids) {
+                const [title, body] = await invoke<[string, string]>('load_note', { id });
+                
+                this.notes.push({
+                    id,
+                    title,
+                    body,
+                    updatedAt: new Date(),
+                    isDirty: false
+                });
             }
-        ];
+            
+            console.log(`Loaded ${ids.length} notes from disk`);
+        } catch (error) {
+            console.error('Failed to load notes:', error);
+        }
     }
 
-    // 3. Actions
+    // 4. Actions
     select(id: string) {
         this.selectedId = id;
         this.shouldFocusTitle = false;
     }
 
-    create() {
+    async create() {
         const newNote: Note = {
             id: crypto.randomUUID(),
             title: '',
             body: '',
             updatedAt: new Date(),
-            isDirty: false
+            isDirty: true  // New notes need to be saved
         };
         this.notes = [newNote, ...this.notes];
         this.selectedId = newNote.id;
         this.shouldFocusTitle = true;
     }
 
-    delete(id: string) {
-        this.notes = this.notes.filter(n => n.id !== id);
-        if (this.selectedId === id) {
-            this.selectedId = null;
+    async delete(id: string) {
+        try {
+            // Delete from disk first
+            await invoke('delete_note', { id });
+            
+            // Then remove from UI
+            this.notes = this.notes.filter(n => n.id !== id);
+            if (this.selectedId === id) {
+                this.selectedId = null;
+            }
+            
+            console.log(`Deleted note ${id}`);
+        } catch (error) {
+            console.error('Failed to delete note:', error);
         }
     }
 
@@ -64,9 +89,9 @@ class NoteState {
         if (this.activeNote) {
             this.activeNote.title = newTitle;
             this.activeNote.updatedAt = new Date();
-            this.activeNote.isDirty = true;  // Red dot appears
+            this.activeNote.isDirty = true;
             
-            this.scheduleAutoSave();  // ✅ Schedule background save
+            this.scheduleAutoSave();
         }
     }
 
@@ -74,49 +99,66 @@ class NoteState {
         if (this.activeNote) {
             this.activeNote.body = newBody;
             this.activeNote.updatedAt = new Date();
-            this.activeNote.isDirty = true;  // Red dot appears
+            this.activeNote.isDirty = true;
             
-            this.scheduleAutoSave();  // ✅ Schedule background save
+            this.scheduleAutoSave();
         }
     }
 
-    // ✅ Auto-save: Saves data but keeps red dot
+    // Auto-save: Saves data but keeps red dot
     private scheduleAutoSave() {
-        // Clear existing timer
         if (this.autoSaveTimer) {
             clearTimeout(this.autoSaveTimer);
         }
         
-        // Schedule new auto-save
         this.autoSaveTimer = setTimeout(() => {
             if (this.activeNote) {
                 this.autoSaveToBackend(this.activeNote);
-                // Note: isDirty stays TRUE - red dot remains!
             }
         }, this.AUTO_SAVE_DELAY) as unknown as number;
     }
 
-    // ✅ Background save (silent, no UI change)
-    private autoSaveToBackend(note: Note) {
-        console.log(`[Auto-save] Saved note "${note.title || 'Untitled'}" to backend`);
-        // TODO: Call Tauri backend to persist to disk
-        // await invoke('save_note', { note });
-    }
-
-    // ✅ Manual save: Clears red dot (user acknowledgment)
-    save(id: string) {
-        const note = this.notes.find(n => n.id === id);
-        if (note) {
-            note.isDirty = false;  // ✅ Clear red dot
-            this.autoSaveToBackend(note);  // Also save immediately
-            console.log(`[Manual save] User saved note "${note.title || 'Untitled'}"`);
+    // Background save (silent, no UI change)
+    private async autoSaveToBackend(note: Note) {
+        try {
+            // Call Rust to save to disk
+            await invoke('save_note', {
+                id: note.id,
+                title: note.title,
+                body: note.body
+            });
+            
+            console.log(`[Auto-save] Saved note "${note.title || 'Untitled'}" to disk`);
+        } catch (error) {
+            console.error('Auto-save failed:', error);
         }
     }
 
-    // ✅ Save active note
-    saveActive() {
+    // Manual save: Clears red dot (user acknowledgment)
+    async save(id: string) {
+        const note = this.notes.find(n => n.id === id);
+        if (note) {
+            try {
+                // Save to disk
+                await invoke('save_note', {
+                    id: note.id,
+                    title: note.title,
+                    body: note.body
+                });
+                
+                // Clear red dot
+                note.isDirty = false;
+                console.log(`[Manual save] User saved note "${note.title || 'Untitled'}"`);
+            } catch (error) {
+                console.error('Save failed:', error);
+            }
+        }
+    }
+
+    // Save active note
+    async saveActive() {
         if (this.activeNote) {
-            this.save(this.activeNote.id);
+            await this.save(this.activeNote.id);
         }
     }
 }
