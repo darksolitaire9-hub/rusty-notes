@@ -1,39 +1,29 @@
 <script lang="ts">
   import { noteStore } from '$lib/state/notes.svelte';
   import TipexEditor from './TipexEditor.svelte';
+  import NoteHeader from './NoteHeader.svelte';
 
   let note = $derived(noteStore.activeNote);
 
-  // Auto-focus title when creating new note
-  function focusOnMount(node: HTMLInputElement) {
-    if (noteStore.shouldFocusTitle) {
-      setTimeout(() => {
-        node.focus();
-        noteStore.shouldFocusTitle = false;
-      }, 50);
+  // Keyboard shortcut for save (Ctrl+S / Cmd+S)
+  function handleKeydown(e: KeyboardEvent) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      noteStore.saveActive();
     }
   }
 </script>
 
+<svelte:window onkeydown={handleKeydown} />
+
 <div class="flex flex-col h-full w-full bg-background text-foreground">
   
   {#if note}
-    <!-- Title Input - Expanded with plenty of room -->
-    <div class="border-b border-border px-8 py-8 z-20 relative bg-muted/30 backdrop-blur">
-      {#key note.id}
-        <input 
-          use:focusOnMount
-          type="text" 
-          value={note.title}
-          oninput={(e) => noteStore.updateTitle(e.currentTarget.value)}
-          placeholder="Untitled"
-          class="w-full bg-transparent text-4xl font-extrabold text-foreground focus:outline-none placeholder:text-muted-foreground/40 tracking-tight leading-relaxed py-2"
-        />
-      {/key}
-    </div>
+    <!-- Note Header (Title + Save Button) -->
+    <NoteHeader {note} />
 
-    <!-- Editor Area (Clean, No Fixed Toolbar) -->
-    <div class="flex-1 overflow-hidden relative z-10">
+    <!-- Editor Area -->
+    <div class="flex-1 overflow-hidden relative z-10 bg-background">
       {#key note.id}
         <TipexEditor 
           value={note.body} 

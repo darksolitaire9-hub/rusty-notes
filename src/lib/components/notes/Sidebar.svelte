@@ -1,14 +1,8 @@
 <script lang="ts">
-  // 1. Import the store
   import { noteStore } from '$lib/state/notes.svelte';
-  
   import { Button } from '$lib/components/ui/button';
   import { Plus, Trash2, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-svelte';
 
-  // 2. Remove the props definition ($props)
-  // We don't need them because we read directly from noteStore!
-
-  // Internal state for "Accordion/Collapse" behavior
   let isCollapsed = $state(false);
 
   function toggleSidebar() {
@@ -16,15 +10,10 @@
   }
 </script>
 
-<!-- 
-  transition-all duration-300: Animates the width change 
-  w-64 vs w-16: The widths for open vs collapsed states
--->
 <aside class="flex-none border-r border-border bg-muted/10 flex flex-col h-full transition-all duration-300 ease-in-out {isCollapsed ? 'w-16' : 'w-64'}">
   
-  <!-- Sidebar Header (Toggle & Create) -->
+  <!-- Sidebar Header -->
   <div class="p-4 border-b border-border flex items-center justify-between gap-2">
-    <!-- Collapse Toggle -->
     <Button variant="ghost" size="icon" class="h-8 w-8 shrink-0" onclick={toggleSidebar}>
       {#if isCollapsed}
         <PanelLeftOpen class="h-4 w-4" />
@@ -33,7 +22,6 @@
       {/if}
     </Button>
 
-    <!-- Create Button (Text hides when collapsed) -->
     <Button 
       onclick={() => noteStore.create()} 
       variant={isCollapsed ? "ghost" : "default"}
@@ -57,16 +45,26 @@
         {isCollapsed ? 'justify-center' : 'justify-start'}"
         title={note.title} 
       >
-        <!-- Icon always shows -->
-        <FileText class="h-4 w-4 shrink-0 opacity-70" />
+        <!-- Icon with red dot indicator -->
+        <div class="relative shrink-0">
+          <FileText class="h-4 w-4 opacity-70" />
+          
+          <!-- ✅ Red dot for unacknowledged changes -->
+          {#if note.isDirty}
+            <span 
+              class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive animate-pulse"
+              title="Unsaved changes"
+            ></span>
+          {/if}
+        </div>
 
-        <!-- Text details hide when collapsed -->
+        <!-- Text details -->
         {#if !isCollapsed}
           <div class="min-w-0 flex-1 overflow-hidden">
             <div class="flex items-center justify-between font-semibold">
               <span class="truncate text-sm">{note.title || 'Untitled'}</span>
               
-              <!-- Delete Button: Only show if selected (or you can use group-hover) -->
+              <!-- Delete Button -->
               {#if noteStore.selectedId === note.id}
                 <div 
                   role="button" 
