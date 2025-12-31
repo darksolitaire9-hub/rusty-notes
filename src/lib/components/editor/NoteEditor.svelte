@@ -18,19 +18,20 @@
 <div class="flex flex-col h-full w-full bg-slate-950 text-slate-200">
   
   {#if note}
-    <!-- Title Input -->
-    <div class="border-b border-slate-800 px-8 py-6 z-20 relative bg-slate-950">
-      {#key note.id}
-        <input 
-          use:focusOnMount
-          type="text" 
-          value={note.title}
-          oninput={(e) => noteStore.updateTitle(e.currentTarget.value)}
-          placeholder="Untitled"
-          class="w-full bg-transparent text-4xl font-extrabold text-white focus:outline-none placeholder-slate-700 tracking-tight"
-        />
-      {/key}
-    </div>
+ <!-- Title Input - Expanded with plenty of room -->
+<div class="border-b border-slate-800 px-8 py-8 z-20 relative bg-slate-950">
+  {#key note.id}
+    <input 
+      use:focusOnMount
+      type="text" 
+      value={note.title}
+      oninput={(e) => noteStore.updateTitle(e.currentTarget.value)}
+      placeholder="Untitled"
+      class="w-full bg-transparent text-4xl font-extrabold text-white focus:outline-none placeholder-slate-700 tracking-tight leading-relaxed py-2"
+    />
+  {/key}
+</div>
+
 
     <!-- Editor Area (Clean, No Fixed Toolbar) -->
     <div class="flex-1 overflow-hidden relative z-10">
