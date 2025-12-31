@@ -16,7 +16,7 @@
 </script>
 
 <select 
-  class="h-8 px-3 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 cursor-pointer hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+  class="h-8 px-3 bg-muted border border-border rounded text-sm text-foreground cursor-pointer hover:bg-muted/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
   onchange={handleChange}
   title="Text Style"
 >

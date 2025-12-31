@@ -1,1 +1,1 @@
-<div class="w-px h-6 bg-slate-700 mx-1"></div>
+<div class="w-px h-6 bg-border mx-1"></div>

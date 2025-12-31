@@ -15,23 +15,22 @@
   }
 </script>
 
-<div class="flex flex-col h-full w-full bg-slate-950 text-slate-200">
+<div class="flex flex-col h-full w-full bg-background text-foreground">
   
   {#if note}
- <!-- Title Input - Expanded with plenty of room -->
-<div class="border-b border-slate-800 px-8 py-8 z-20 relative bg-slate-950">
-  {#key note.id}
-    <input 
-      use:focusOnMount
-      type="text" 
-      value={note.title}
-      oninput={(e) => noteStore.updateTitle(e.currentTarget.value)}
-      placeholder="Untitled"
-      class="w-full bg-transparent text-4xl font-extrabold text-white focus:outline-none placeholder-slate-700 tracking-tight leading-relaxed py-2"
-    />
-  {/key}
-</div>
-
+    <!-- Title Input - Expanded with plenty of room -->
+    <div class="border-b border-border px-8 py-8 z-20 relative bg-muted/30 backdrop-blur">
+      {#key note.id}
+        <input 
+          use:focusOnMount
+          type="text" 
+          value={note.title}
+          oninput={(e) => noteStore.updateTitle(e.currentTarget.value)}
+          placeholder="Untitled"
+          class="w-full bg-transparent text-4xl font-extrabold text-foreground focus:outline-none placeholder:text-muted-foreground/40 tracking-tight leading-relaxed py-2"
+        />
+      {/key}
+    </div>
 
     <!-- Editor Area (Clean, No Fixed Toolbar) -->
     <div class="flex-1 overflow-hidden relative z-10">
@@ -45,12 +44,12 @@
 
   {:else}
     <!-- Empty State -->
-    <div class="flex h-full w-full items-center justify-center text-slate-500">
+    <div class="flex h-full w-full items-center justify-center text-muted-foreground">
       <div class="text-center">
         <p class="text-xl mb-4">No note selected</p>
         <button 
           onclick={() => noteStore.create()}
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded hover:opacity-90 transition-all"
         >
           Create New Note
         </button>
