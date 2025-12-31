@@ -1,5 +1,8 @@
 // Import Tauri's invoke function to call Rust commands
 import { invoke } from '@tauri-apps/api/core';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
+
 
 export type Note = {
     id: string;
@@ -7,6 +10,7 @@ export type Note = {
     body: string;
     updatedAt: Date;
     isDirty: boolean;
+     filePath?: string;
 };
 
 class NoteState {
@@ -156,11 +160,43 @@ class NoteState {
     }
 
     // Save active note
-    async saveActive() {
-        if (this.activeNote) {
-            await this.save(this.activeNote.id);
-        }
+   async saveActive() {
+    if (!this.activeNote) return;
+    
+    const note = this.activeNote;
+    
+    // If no file path, ask user where to save
+    if (!note.filePath) {
+        const filePath = await save({
+            defaultPath: note.title || 'Untitled.html',
+            filters: [{
+                name: 'HTML',
+                extensions: ['html']
+            }]
+        });
+        
+        if (!filePath) return; // User cancelled
+        
+        note.filePath = filePath;
     }
+    
+    // Save to the file path
+    try {
+        await writeTextFile(note.filePath, note.body);
+        
+        // Also save to backend
+        await invoke('save_note', {
+            id: note.id,
+            title: note.title,
+            body: note.body
+        });
+        
+        note.isDirty = false;
+        console.log(`Saved note to ${note.filePath}`);
+    } catch (error) {
+        console.error('Save failed:', error);
+    }
+}
 }
 
 // Export a global singleton instance

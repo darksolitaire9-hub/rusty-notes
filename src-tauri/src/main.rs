@@ -9,6 +9,8 @@ mod services;  // Services folder
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         // Register all our commands so Svelte can call them
         .invoke_handler(tauri::generate_handler![
             commands::save_note,
