@@ -3,7 +3,6 @@
   import { noteStore } from '$lib/state/notes.svelte';
   import Sidebar from '$lib/components/notes/Sidebar.svelte'; 
   import NoteEditor from '$lib/components/editor/NoteEditor.svelte';
-  import { handleGlobalShortcut } from '$lib/shortcuts/handlers'; // ⬅️ new
 
   // Load notes from disk when app starts
   onMount(async () => {
@@ -20,8 +19,6 @@
   });
 </script>
 
-<!-- Global keyboard listener scoped to this page/window -->
-<svelte:window on:keydown={handleGlobalShortcut} />
 
 <!-- 
   This div fills the space. Sidebar and Editor side-by-side.

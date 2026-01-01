@@ -1,10 +1,15 @@
 <script lang="ts">
   import NavBar from '$lib/components/layout/NavBar.svelte';
   import '../app.css';
+  import { handleGlobalShortcut } from '$lib/shortcuts/handlers';
+
 
   // In Svelte 5, we receive children as a prop instead of using <slot>
   let { children } = $props();
 </script>
+
+<!-- Global keyboard listener for the entire app -->
+<svelte:window on:keydown={handleGlobalShortcut} />
 
 <!-- The App Container -->
 <div class="flex h-screen flex-col overflow-hidden bg-background text-foreground">
