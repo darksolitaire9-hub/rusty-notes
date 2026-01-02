@@ -1,86 +1,74 @@
-// Import our Note model and StorageService
-use crate::models::Note;
-use crate::services::StorageService;
-use tauri::Manager; 
-/// Tauri command: Save a note to disk
-/// Called from Svelte: invoke('save_note', { id, title, body })
+use tauri::State;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use crate::services::db_storage::DbStorage;
+use crate::db::schema::{Note, NoteWithAttachments};
+use chrono::Utc;
+
+type StorageState = Arc<Mutex<DbStorage>>;
+
 #[tauri::command]
-pub fn save_note(
+pub async fn create_note(
+    title: String,
+    body: String,
+    storage: State<'_, StorageState>,
+) -> Result<Note, String> {
+    let note = Note {
+        id: uuid::Uuid::new_v4().to_string(),
+        title,
+        body,
+        created_at: Utc::now().timestamp(),
+        updated_at: Utc::now().timestamp(),
+    };
+    
+    storage.lock().await.create_note(note).await
+}
+
+#[tauri::command]
+pub async fn get_note(
+    id: String,
+    storage: State<'_, StorageState>,
+) -> Result<NoteWithAttachments, String> {
+    storage.lock().await.get_note(&id).await
+}
+
+#[tauri::command]
+pub async fn list_notes(
+    storage: State<'_, StorageState>,
+) -> Result<Vec<Note>, String> {
+    storage.lock().await.list_notes().await
+}
+
+#[tauri::command]
+pub async fn update_note(
     id: String,
     title: String,
     body: String,
-    app_handle: tauri::AppHandle
-) -> Result<(), String> {
-    // Get the app data directory path
-    let app_dir = app_handle.path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?;
+    storage: State<'_, StorageState>,
+) -> Result<Note, String> {
+    let note = Note {
+        id,
+        title,
+        body,
+        created_at: 0,
+        updated_at: Utc::now().timestamp(),
+    };
     
-    // Create storage service with that path
-    let storage = StorageService::new(app_dir)?;
-    
-    // Create a Note struct from the data
-    let note = Note { id, title, body };
-    
-    // Save it to disk using the storage service
-    storage.save(&note)
+    storage.lock().await.update_note(note).await
 }
 
-/// Tauri command: Load a note from disk
-/// Called from Svelte: invoke('load_note', { id })
-/// Returns: [title, body]
 #[tauri::command]
-pub fn load_note(
+pub async fn delete_note(
     id: String,
-    app_handle: tauri::AppHandle
-) -> Result<(String, String), String> {
-    // Get the app data directory
-    let app_dir = app_handle.path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?;
-    
-    // Create storage service
-    let storage = StorageService::new(app_dir)?;
-    
-    // Load the note from disk
-    let note = storage.load(&id)?;
-    
-    // Return title and body as a tuple
-    Ok((note.title, note.body))
-}
-
-/// Tauri command: List all note IDs
-/// Called from Svelte: invoke('list_notes')
-/// Returns: ["abc-123", "def-456", ...]
-#[tauri::command]
-pub fn list_notes(app_handle: tauri::AppHandle) -> Result<Vec<String>, String> {
-    // Get the app data directory
-    let app_dir = app_handle.path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?;
-    
-    // Create storage service
-    let storage = StorageService::new(app_dir)?;
-    
-    // List all note IDs
-    storage.list()
-}
-
-/// Tauri command: Delete a note from disk
-/// Called from Svelte: invoke('delete_note', { id })
-#[tauri::command]
-pub fn delete_note(
-    id: String,
-    app_handle: tauri::AppHandle
+    storage: State<'_, StorageState>,
 ) -> Result<(), String> {
-    // Get the app data directory
-    let app_dir = app_handle.path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?;
-    
-    // Create storage service
-    let storage = StorageService::new(app_dir)?;
-    
-    // Delete the note
-    storage.delete(&id)
+    storage.lock().await.delete_note(&id).await
+}
+
+#[tauri::command]
+pub async fn search_notes(
+    query: String,
+    storage: State<'_, StorageState>,
+) -> Result<Vec<Note>, String> {
+    storage.lock().await.search_notes(&query).await
 }
