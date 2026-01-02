@@ -72,22 +72,25 @@ class NoteState {
         this.shouldFocusTitle = true;
     }
 
-    async delete(id: string) {
-        try {
-            // Delete from disk first
-            await invoke('delete_note', { id });
-            
-            // Then remove from UI
-            this.notes = this.notes.filter(n => n.id !== id);
-            if (this.selectedId === id) {
-                this.selectedId = null;
-            }
-            
-            console.log(`Deleted note ${id}`);
-        } catch (error) {
-            console.error('Failed to delete note:', error);
-        }
+async delete(id: string) {
+  try {
+    // Try to delete from disk (it's OK if it doesn't exist)
+    await invoke('delete_note', { id }).catch((err) => {
+      // If note wasn't saved to disk yet, that's fine
+      console.log(`Note ${id} wasn't on disk yet:`, err);
+    });
+    
+    // Always remove from UI regardless
+    this.notes = this.notes.filter(n => n.id !== id);
+    if (this.selectedId === id) {
+      this.selectedId = this.notes.length > 0 ? this.notes[0].id : null;
     }
+    
+    console.log(`Deleted note ${id}`);
+  } catch (error) {
+    console.error('Failed to delete note:', error);
+  }
+}
 
     updateTitle(newTitle: string) {
         if (this.activeNote) {

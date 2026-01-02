@@ -10,9 +10,13 @@
   }
 </script>
 
-<aside class="flex-none border-r border-border bg-muted/10 flex flex-col h-full transition-all duration-300 ease-in-out {isCollapsed ? 'w-16' : 'w-64'}">
-  
-  <!-- Sidebar Header -->
+<aside
+  class="flex-none border-r border-border bg-muted/10 flex flex-col h-full
+         transition-all duration-300 ease-in-out
+         {isCollapsed ? 'w-16' : 'w-64'}"
+>
+
+  <!-- Header -->
   <div class="p-4 border-b border-border flex items-center justify-between gap-2">
     <Button variant="ghost" size="icon" class="h-8 w-8 shrink-0" onclick={toggleSidebar}>
       {#if isCollapsed}
@@ -22,8 +26,8 @@
       {/if}
     </Button>
 
-    <Button 
-      onclick={() => noteStore.create()} 
+    <Button
+      onclick={() => noteStore.create()}
       variant={isCollapsed ? "ghost" : "default"}
       size={isCollapsed ? "icon" : "default"}
       class="{isCollapsed ? 'h-8 w-8' : 'flex-1'} transition-all"
@@ -34,55 +38,70 @@
       {/if}
     </Button>
   </div>
-  
+
   <!-- Note List -->
   <div class="flex-1 overflow-y-auto p-2 space-y-1">
     {#each noteStore.notes as note (note.id)}
-      <button
+
+      <!-- Replaced <button> with <div role="button"> -->
+      <div
+        role="button"
+        tabindex="0"
         onclick={() => noteStore.select(note.id)}
-        class="group flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all hover:bg-accent 
-        {noteStore.selectedId === note.id ? 'bg-accent text-accent-foreground' : ''} 
-        {isCollapsed ? 'justify-center' : 'justify-start'}"
-        title={note.title} 
+        onkeydown={(e) => { if (e.key === 'Enter') noteStore.select(note.id); }}
+        class="group flex w-full items-center gap-3 rounded-lg p-3 text-left
+               transition-all hover:bg-accent cursor-pointer
+               {noteStore.selectedId === note.id ? 'bg-accent text-accent-foreground' : ''}
+               {isCollapsed ? 'justify-center' : 'justify-start'}"
+        title={note.title}
       >
-        <!-- Icon with red dot indicator -->
+
+        <!-- Icon + Dirty Dot -->
         <div class="relative shrink-0">
           <FileText class="h-4 w-4 opacity-70" />
-          
-          <!-- ✅ Red dot for unacknowledged changes -->
+
           {#if note.isDirty}
-            <span 
+            <span
               class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive animate-pulse"
               title="Unsaved changes"
             ></span>
           {/if}
         </div>
 
-        <!-- Text details -->
+        <!-- Text + Delete Button -->
         {#if !isCollapsed}
           <div class="min-w-0 flex-1 overflow-hidden">
+
             <div class="flex items-center justify-between font-semibold">
               <span class="truncate text-sm">{note.title || 'Untitled'}</span>
-              
-              <!-- Delete Button -->
+
               {#if noteStore.selectedId === note.id}
-                <div 
-                  role="button" 
+                <div
+                  role="button"
                   tabindex="0"
-                  class="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-sm hover:bg-background/20"
-                  onclick={(e) => { e.stopPropagation(); noteStore.delete(note.id); }}
-                  onkeydown={(e) => { if(e.key === 'Enter') noteStore.delete(note.id); }}
+                  class="opacity-0 group-hover:opacity-100 transition-opacity
+                         p-1 rounded-sm hover:bg-background/20"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    noteStore.delete(note.id);
+                  }}
+                  onkeydown={(e) => {
+                    if (e.key === 'Enter') noteStore.delete(note.id);
+                  }}
                 >
-                   <Trash2 class="h-3 w-3 text-destructive hover:text-destructive/80" />
+                  <Trash2 class="h-3 w-3 text-destructive hover:text-destructive/80" />
                 </div>
               {/if}
             </div>
+
             <div class="line-clamp-1 text-xs text-muted-foreground truncate">
               {note.body || 'No additional text'}
             </div>
+
           </div>
         {/if}
-      </button>
+
+      </div>
     {/each}
   </div>
 </aside>
