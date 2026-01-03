@@ -1,5 +1,11 @@
 <script lang="ts">
+  import { modalOpen } from '$lib/state/ui';
+
   let { children, open = true, onComplete } = $props();
+
+  $effect(() => {
+    modalOpen.set(open);
+  });
 </script>
 
 {#if open}
