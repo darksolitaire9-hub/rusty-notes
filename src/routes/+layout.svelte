@@ -1,25 +1,93 @@
+<!-- src/routes/+layout.svelte -->
 <script lang="ts">
-  import NavBar from '$lib/components/layout/NavBar.svelte';
   import '../app.css';
+
+  import NavBar from '$lib/components/layout/NavBar.svelte';
   import { handleGlobalShortcut } from '$lib/shortcuts/handlers';
+  import OnboardingModal from '$lib/components/onboarding/OnboardingModal.svelte';
+  import OnboardingForm from '$lib/components/onboarding/OnboardingForm.svelte';
+  import { browser } from '$app/environment';
+  import { invoke } from '@tauri-apps/api/core';
 
-
-  // In Svelte 5, we receive children as a prop instead of using <slot>
+  // layout children snippet
   let { children } = $props();
+
+  // reactive state in runes mode
+  let showOnboarding = $state(false);
+  let settingsLoaded = $state(false);
+
+  // Load settings from Rust backend (browser only)
+  $effect(() => {
+    if (!browser) return;
+
+    (async () => {
+      try {
+        const settings = await invoke<{
+          version: number;
+          notes_folder: string;
+          auto_save_interval_secs: number;
+          delete_behavior: string;
+          onboarding_completed: boolean;
+        }>('get_settings');
+
+        showOnboarding = !settings.onboarding_completed;
+        settingsLoaded = true;
+      } catch (err) {
+        console.error('Failed to load settings:', err);
+        settingsLoaded = true; // show UI anyway to avoid blank screen
+      }
+    })();
+  });
+
+  async function completeOnboarding() {
+    if (!browser) return;
+
+    try {
+      // Call Rust command to persist the flag
+      await invoke('complete_onboarding');
+      showOnboarding = false;
+    } catch (err) {
+      console.error('Failed to complete onboarding:', err);
+    }
+  }
 </script>
 
-<!-- Global keyboard listener for the entire app -->
-<svelte:window on:keydown={handleGlobalShortcut} />
+<svelte:window onkeydown={handleGlobalShortcut} />
 
-<!-- The App Container -->
-<div class="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-  
-  <!-- Top Navigation -->
+<!-- App Container -->
+<div
+  class={`app-shell flex h-screen flex-col overflow-hidden bg-background text-foreground ${
+    showOnboarding ? 'blurred' : ''
+  }`}
+>
   <NavBar />
 
-  <!-- Main Content Area -->
   <div class="flex flex-1 overflow-hidden">
-    {@render children()}
+    {#if settingsLoaded}
+      {@render children()}
+    {:else}
+      <div class="flex items-center justify-center flex-1">
+        <p>Loading…</p>
+      </div>
+    {/if}
   </div>
-
 </div>
+
+{#if showOnboarding && settingsLoaded}
+  <OnboardingModal open={showOnboarding} onComplete={completeOnboarding}>
+    {#snippet children({ onComplete }: { onComplete: () => void })}
+      <OnboardingForm on:complete={onComplete} />
+    {/snippet}
+  </OnboardingModal>
+{/if}
+
+<style>
+  .app-shell {
+    transition: filter 0.25s ease;
+  }
+
+  .blurred {
+    filter: blur(8px) brightness(0.8);
+    pointer-events: none;
+  }
+</style>
