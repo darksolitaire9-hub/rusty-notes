@@ -43,9 +43,9 @@
     if (!browser) return;
 
     try {
-      // Call Rust command to persist the flag
+      // Optional extra persist; your submit component already calls this
       await invoke('complete_onboarding');
-      showOnboarding = false;
+      showOnboarding = false; // ✅ hide modal
     } catch (err) {
       console.error('Failed to complete onboarding:', err);
     }
@@ -76,7 +76,8 @@
 {#if showOnboarding && settingsLoaded}
   <OnboardingModal open={showOnboarding} onComplete={completeOnboarding}>
     {#snippet children({ onComplete }: { onComplete: () => void })}
-      <OnboardingForm on:complete={onComplete} />
+      <!-- ✅ use callback prop, not on:complete -->
+      <OnboardingForm {onComplete} />
     {/snippet}
   </OnboardingModal>
 {/if}
