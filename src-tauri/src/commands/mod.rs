@@ -1,2 +1,4 @@
-// Declare the notes commands module
+// src/commands/mod.rs
 pub mod notes;
+pub mod settings_commands;
+
