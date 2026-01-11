@@ -1,13 +1,13 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
-  import '../app.css';
+  import "../app.css";
 
-  import NavBar from '$lib/components/layout/NavBar.svelte';
-  import { handleGlobalShortcut } from '$lib/shortcuts/handlers';
-  import OnboardingModal from '$lib/components/onboarding/OnboardingModal.svelte';
-  import OnboardingForm from '$lib/components/onboarding/OnboardingForm.svelte';
-  import { browser } from '$app/environment';
-  import { invoke } from '@tauri-apps/api/core';
+  import NavBar from "$lib/shared/components/layout/Header.svelte";
+  import { handleGlobalShortcut } from "$lib/shared/shortcuts/handlers";
+  import OnboardingModal from "$lib/features/settings/components/onboarding/OnboardingModal.svelte";
+  import OnboardingForm from "$lib/features/settings/components/onboarding/OnboardingForm.svelte";
+  import { browser } from "$app/environment";
+  import { invoke } from "@tauri-apps/api/core";
 
   // layout children snippet
   let { children } = $props();
@@ -28,12 +28,12 @@
           auto_save_interval_secs: number;
           delete_behavior: string;
           onboarding_completed: boolean;
-        }>('get_settings');
+        }>("get_settings");
 
         showOnboarding = !settings.onboarding_completed;
         settingsLoaded = true;
       } catch (err) {
-        console.error('Failed to load settings:', err);
+        console.error("Failed to load settings:", err);
         settingsLoaded = true; // show UI anyway to avoid blank screen
       }
     })();
@@ -44,10 +44,10 @@
 
     try {
       // Optional extra persist; your submit component already calls this
-      await invoke('complete_onboarding');
+      await invoke("complete_onboarding");
       showOnboarding = false; // ✅ hide modal
     } catch (err) {
-      console.error('Failed to complete onboarding:', err);
+      console.error("Failed to complete onboarding:", err);
     }
   }
 </script>
@@ -57,7 +57,7 @@
 <!-- App Container -->
 <div
   class={`app-shell flex h-screen flex-col overflow-hidden bg-background text-foreground ${
-    showOnboarding ? 'blurred' : ''
+    showOnboarding ? "blurred" : ""
   }`}
 >
   <NavBar />

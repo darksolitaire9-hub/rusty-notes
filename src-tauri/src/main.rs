@@ -5,10 +5,9 @@ mod commands;
 mod services;
 mod models;
 mod settings;
-mod state;
 
 use tauri::Manager;
-use std::sync::{Arc, Mutex as StdMutex};
+use std::sync::Arc;
 use tokio::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -35,10 +34,9 @@ fn main() {
             )
             .expect("Failed to load settings");
 
-            // Register settings state
-            app.manage(crate::state::SettingsState {
-                inner: StdMutex::new(settings),
-            });
+            // Register settings state (using tokio Mutex for async commands)
+            let settings_state = Arc::new(Mutex::new(settings));
+            app.manage(settings_state);
 
             // Initialize database
             let pool = tauri::async_runtime::block_on(async {
@@ -58,14 +56,14 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            // existing note commands
+            // note commands
             commands::notes::create_note,
             commands::notes::get_note,
             commands::notes::list_notes,
             commands::notes::update_note,
-            commands::notes::delete_note,
+            commands::notes::delete_note,      // unified delete
             commands::notes::search_notes,
-            // new settings commands
+            // settings commands
             commands::settings_commands::get_settings,
             commands::settings_commands::complete_onboarding,
             commands::settings_commands::update_settings,

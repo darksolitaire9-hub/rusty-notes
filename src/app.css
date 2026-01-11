@@ -127,5 +127,17 @@
   }
   body {
     @apply bg-background text-foreground;
+
   }
+
+
+  ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.dark ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
 }
