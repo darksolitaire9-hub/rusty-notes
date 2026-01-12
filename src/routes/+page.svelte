@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { noteService } from "$lib/features/notes/notes-index";
+  import { noteService } from "$lib/features/notes/store/notes-service.svelte";
   import NotesSidebar from "$lib/features/notes/components/sidebar/NotesSidebar.svelte";
   import NoteEditor from "$lib/features/notes/components/editor/NoteEditor.svelte";
-  import { handleGlobalShortcut } from "$lib/shared/shortcuts/handlers";
   import { browser } from "$app/environment";
 
   // Load notes when the component mounts
@@ -11,8 +10,6 @@
     noteService.load();
   });
 </script>
-
-<svelte:window onkeydown={handleGlobalShortcut} />
 
 <div class="flex h-full w-full">
   <NotesSidebar />

@@ -1,4 +1,3 @@
-import { noteService } from '$lib/features/notes/notes-index';
 import { modalOpen } from '$lib/shared/state/ui';
 import { get } from 'svelte/store';
 
@@ -8,19 +7,19 @@ export function handleGlobalShortcut(event: KeyboardEvent) {
     return;
   }
 
-  // 2. Ctrl+N → New note (exact combo: Ctrl + n, no Shift)
-  if (
-    event.ctrlKey &&
-    !event.shiftKey &&
-    event.key.toLowerCase() === 'n'
-  ) {
-    event.preventDefault();
-    event.stopPropagation();
-    noteService.create();
+  // 2. Don't handle shortcuts in text fields
+  const target = event.target as HTMLElement | null;
+  const inTextField = target?.matches('input, textarea, [contenteditable]');
+  
+  if (inTextField) {
     return;
   }
 
-  // 3. Keep for future shortcuts that should not interrupt typing
-  const target = event.target as HTMLElement | null;
-  const inTextField = target?.matches('input, textarea, [contenteditable]');
+  // Note: Ctrl+N is now handled by Rust global shortcuts
+  // Add other DOM-specific shortcuts here if needed
+  
+  // Example future shortcuts:
+  // if (event.key === 'Escape') {
+  //   // Handle escape
+  // }
 }

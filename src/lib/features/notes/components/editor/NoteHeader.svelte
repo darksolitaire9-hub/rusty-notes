@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { noteService } from '$lib/features/notes/notes-index';
-  import { Button } from '$lib/shared/components/ui/button';
-  import { Save } from 'lucide-svelte';
+  import { noteService } from "$lib/features/notes/store/notes-service.svelte";
+  import { Button } from "$lib/shared/components/ui/button";
+  import { Save } from "lucide-svelte";
 
   let note = $derived(noteService.activeNote);
 
@@ -10,10 +10,10 @@
       setTimeout(() => {
         node.focus();
         node.select();
-        noteService.clearTitleFocus()
+        noteService.clearTitleFocus();
       }, 50);
     }
-    
+
     return {
       update(newShouldFocus: boolean) {
         if (newShouldFocus) {
@@ -23,7 +23,7 @@
             noteService.requestTitleFocus();
           }, 50);
         }
-      }
+      },
     };
   }
 
@@ -33,7 +33,9 @@
 </script>
 
 {#if note}
-  <div class="border-b border-border px-8 py-8 z-20 relative bg-muted/30 backdrop-blur">
+  <div
+    class="border-b border-border px-8 py-8 z-20 relative bg-muted/30 backdrop-blur"
+  >
     <div class="flex items-center gap-4">
       <div class="flex-1">
         {#key note.id}

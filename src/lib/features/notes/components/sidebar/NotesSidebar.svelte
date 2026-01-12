@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { noteService } from '$lib/features/notes/notes-index';
+  import { noteService } from '$lib/features/notes/store/notes-service.svelte';
   import { onDestroy } from 'svelte';
   import SidebarHeader from './SidebarHeader.svelte';
   import NotesList from './NotesList.svelte';

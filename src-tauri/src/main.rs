@@ -5,6 +5,7 @@ mod commands;
 mod services;
 mod models;
 mod settings;
+mod shortcuts;  
 
 use tauri::Manager;
 use std::sync::Arc;
@@ -15,6 +16,7 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())  
         .setup(|app| {
             // Get app data directory
             let app_data_dir = app
@@ -53,6 +55,11 @@ fn main() {
             // Store in app state
             app.manage(storage);
 
+            // ✅ Register all shortcuts
+            if let Err(e) = shortcuts::register_all(&app.handle()) {
+                eprintln!("❌ Failed to register shortcuts: {}", e);
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -61,7 +68,7 @@ fn main() {
             commands::notes::get_note,
             commands::notes::list_notes,
             commands::notes::update_note,
-            commands::notes::delete_note,      // unified delete
+            commands::notes::delete_note,      
             commands::notes::search_notes,
             // settings commands
             commands::settings_commands::get_settings,
