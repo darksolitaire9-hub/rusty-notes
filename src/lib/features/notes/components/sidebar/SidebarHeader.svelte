@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button } from '$lib/shared/components/ui/button';
-  import { Plus } from 'lucide-svelte';
+  import { Plus } from '@lucide/svelte';
   import SidebarToggleButton from './SidebarToggleButton.svelte';
 
   interface Props {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileText, CircleAlertIcon } from 'lucide-svelte';
+  import { FileText, CircleAlert } from '@lucide/svelte';
   import type { Note } from '$lib/features/notes/notes-types';
   import NoteItem from './NoteItem.svelte';
 
@@ -29,7 +29,7 @@
 <!-- Error Banner - shown at top when there's an error -->
 {#if error && !isCollapsed}
   <div class="mx-2 mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded-md flex items-start gap-2">
-    <CircleAlertIcon class="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+    <CircleAlert class="h-4 w-4 text-destructive shrink-0 mt-0.5" />
     <div class="flex-1 min-w-0">
       <p class="text-xs text-destructive">{error}</p>
     </div>

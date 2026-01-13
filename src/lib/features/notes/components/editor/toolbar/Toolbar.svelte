@@ -4,12 +4,13 @@
   import ToolbarDivider from './ToolbarDivider.svelte';
   import HeadingSelect from './HeadingSelect.svelte';
   
-  import { 
+  import type { Component } from 'svelte';
+  import {
     Bold, Italic, Strikethrough, Code, Underline as UnderlineIcon,
     List, ListOrdered, ListTodo, Quote, Minus,
-    AlignLeft, AlignCenter, AlignRight, AlignJustify,
+    AlignStartVertical, AlignCenterVertical, AlignEndVertical, AlignJustify,
     Link as LinkIcon, Undo, Redo, RemoveFormatting
-  } from 'lucide-svelte';
+  } from '@lucide/svelte';
 
   let { editor } = $props<{ editor: Editor | null }>();
   
@@ -22,39 +23,38 @@
 </script>
 
 <div class="flex items-center gap-1 px-4 py-2 border-b border-border bg-muted sticky top-0 z-20 overflow-x-auto">
-
   
   <!-- Text Formatting -->
   <ToolbarButton 
-    icon={Bold} 
+    icon={Bold as Component} 
     title="Bold (Ctrl+B)" 
     isActive={editor?.isActive('bold')} 
     onclick={() => editor?.chain().focus().toggleBold().run()} 
   />
   
   <ToolbarButton 
-    icon={Italic} 
+    icon={Italic as Component} 
     title="Italic (Ctrl+I)" 
     isActive={editor?.isActive('italic')} 
     onclick={() => editor?.chain().focus().toggleItalic().run()} 
   />
 
   <ToolbarButton 
-    icon={UnderlineIcon} 
+    icon={UnderlineIcon as Component} 
     title="Underline (Ctrl+U)" 
     isActive={editor?.isActive('underline')} 
     onclick={() => editor?.chain().focus().toggleUnderline().run()} 
   />
 
   <ToolbarButton 
-    icon={Strikethrough} 
+    icon={Strikethrough as Component} 
     title="Strikethrough" 
     isActive={editor?.isActive('strike')} 
     onclick={() => editor?.chain().focus().toggleStrike().run()} 
   />
 
   <ToolbarButton 
-    icon={Code} 
+    icon={Code as Component} 
     title="Inline Code" 
     isActive={editor?.isActive('code')} 
     onclick={() => editor?.chain().focus().toggleCode().run()} 
@@ -69,28 +69,28 @@
 
   <!-- Alignment -->
   <ToolbarButton 
-    icon={AlignLeft} 
+    icon={AlignStartVertical as Component} 
     title="Align Left" 
     isActive={editor?.isActive({ textAlign: 'left' })} 
     onclick={() => editor?.chain().focus().setTextAlign('left').run()} 
   />
 
   <ToolbarButton 
-    icon={AlignCenter} 
+    icon={AlignCenterVertical as Component} 
     title="Align Center" 
     isActive={editor?.isActive({ textAlign: 'center' })} 
     onclick={() => editor?.chain().focus().setTextAlign('center').run()} 
   />
 
   <ToolbarButton 
-    icon={AlignRight} 
+    icon={AlignEndVertical as Component} 
     title="Align Right" 
     isActive={editor?.isActive({ textAlign: 'right' })} 
     onclick={() => editor?.chain().focus().setTextAlign('right').run()} 
   />
 
   <ToolbarButton 
-    icon={AlignJustify} 
+    icon={AlignJustify as Component} 
     title="Justify" 
     isActive={editor?.isActive({ textAlign: 'justify' })} 
     onclick={() => editor?.chain().focus().setTextAlign('justify').run()} 
@@ -100,21 +100,21 @@
 
   <!-- Lists -->
   <ToolbarButton 
-    icon={List} 
+    icon={List as Component} 
     title="Bullet List" 
     isActive={editor?.isActive('bulletList')} 
     onclick={() => editor?.chain().focus().toggleBulletList().run()} 
   />
   
   <ToolbarButton 
-    icon={ListOrdered} 
+    icon={ListOrdered as Component} 
     title="Numbered List" 
     isActive={editor?.isActive('orderedList')} 
     onclick={() => editor?.chain().focus().toggleOrderedList().run()} 
   />
 
   <ToolbarButton 
-    icon={ListTodo} 
+    icon={ListTodo as Component} 
     title="Task List" 
     isActive={editor?.isActive('taskList')} 
     onclick={() => editor?.chain().focus().toggleTaskList().run()} 
@@ -124,27 +124,27 @@
 
   <!-- Blocks -->
   <ToolbarButton 
-    icon={Quote} 
+    icon={Quote as Component} 
     title="Quote" 
     isActive={editor?.isActive('blockquote')} 
     onclick={() => editor?.chain().focus().toggleBlockquote().run()} 
   />
 
   <ToolbarButton 
-    icon={Minus} 
+    icon={Minus as Component} 
     title="Horizontal Line" 
     onclick={() => editor?.chain().focus().setHorizontalRule().run()} 
   />
 
   <ToolbarButton 
-    icon={LinkIcon} 
+    icon={LinkIcon as Component} 
     title="Add Link" 
     isActive={editor?.isActive('link')} 
     onclick={addLink} 
   />
 
   <ToolbarButton 
-    icon={RemoveFormatting} 
+    icon={RemoveFormatting as Component} 
     title="Clear Formatting" 
     onclick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()} 
   />
@@ -153,15 +153,14 @@
 
   <!-- Undo/Redo -->
   <ToolbarButton 
-    icon={Undo} 
+    icon={Undo as Component} 
     title="Undo (Ctrl+Z)" 
     onclick={() => editor?.chain().focus().undo().run()} 
   />
 
   <ToolbarButton 
-    icon={Redo} 
+    icon={Redo as Component} 
     title="Redo (Ctrl+Y)" 
     onclick={() => editor?.chain().focus().redo().run()} 
   />
-
 </div>

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Button } from '$lib/shared/components/ui/button';
-
+  
   let {
-    icon,
+    icon: Icon,  
     title,
     isActive = false,
     onclick
@@ -16,5 +16,5 @@
   onclick={onclick}
   title={title}
 >
-  <icon class="h-4 w-4"></icon>
+  <Icon class="h-4 w-4" />  <!-- Now works as component tag! -->
 </Button>

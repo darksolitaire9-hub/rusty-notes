@@ -1,11 +1,10 @@
 <script lang="ts">
   import { Button } from '$lib/shared/components/ui/button';
-  import { Sun, Moon } from 'lucide-svelte';
+  import { Sun, Moon } from '@lucide/svelte';
   import { themeStore } from '$lib/shared/state/theme.svelte';
- 
+
+  let isDark = $derived(themeStore.isDark);
 </script>
-
-
 
 <header
   class="sticky top-0 z-50 w-full border-b border-border/40 
@@ -13,7 +12,7 @@
          backdrop-blur supports-[backdrop-filter]:bg-background/60"
 >
   <div class="flex h-16 w-full items-center justify-between">
-
+    
     <!-- Brand -->
     <a href="/" class="flex items-center pl-3">
       <img
@@ -32,7 +31,7 @@
         onclick={() => themeStore.toggle()}
         class="h-9 w-9 rounded-full"
       >
-        {#if themeStore.isDark}
+        {#if isDark}
           <Sun class="h-5 w-5 transition-all" />
         {:else}
           <Moon class="h-5 w-5 transition-all" />

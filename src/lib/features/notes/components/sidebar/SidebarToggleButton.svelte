@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button } from '$lib/shared/components/ui/button';
-  import { PanelLeftOpen, PanelLeftClose } from 'lucide-svelte';
+  import { PanelLeftOpen, PanelLeftClose } from '@lucide/svelte';
 
   interface Props {
     isCollapsed: boolean;

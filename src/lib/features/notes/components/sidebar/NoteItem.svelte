@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileText, Trash2 } from 'lucide-svelte';
+  import { FileText, Trash2 } from '@lucide/svelte';
   import type { Note } from '$lib/features/notes/notes-types';
 
   interface Props {
