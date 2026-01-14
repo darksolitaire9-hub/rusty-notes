@@ -7,15 +7,15 @@
     "core:default",
     "dialog:allow-save",
     "dialog:allow-open",
-
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
     "fs:allow-write-text-file",
     "fs:allow-read-text-file",
-
-    {
-      "identifier": "fs:scope",
-      "allow": [
-        "**/*"
-      ]
-    }
+    "fs:allow-read-dir",
+    "fs:allow-exists",
+    "fs:allow-stat",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-rename"
   ]
 }

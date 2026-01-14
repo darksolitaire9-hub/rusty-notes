@@ -1,7 +1,7 @@
 // src-tauri/src/commands/settings_commands.rs
 
 use crate::settings::{Settings, save};
-use tauri::{State, AppHandle, Manager};
+use tauri::{State, AppHandle, Manager};  // ✅ Add Manager here
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -44,5 +44,8 @@ pub async fn update_settings(
     *settings = new_settings;
     let path = settings_file_path(&app);
     save(&path, &settings).map_err(|e| e.to_string())?;
+    
+    println!("✓ Settings saved: {}", settings.notes_folder);
+    
     Ok(())
 }

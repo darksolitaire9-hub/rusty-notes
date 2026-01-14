@@ -37,15 +37,13 @@
   });
 
   
-  $effect(() => {
-    if (!browser) return;
 
-    registerShortcutListeners();
+$effect(() => {
+  if (!browser || !settingsLoaded || showOnboarding) return;
+  registerShortcutListeners();
+  return () => unregisterShortcutListeners();
+});
 
-    return () => {
-      unregisterShortcutListeners();
-    };
-  });
 
   async function completeOnboarding() {
     if (!browser) return;
